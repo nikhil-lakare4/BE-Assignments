@@ -1,61 +1,202 @@
+
+# coding: utf-8
+
+# In[88]:
+
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
-#import matplotlib.pyplot as plt
-
-path="/home/administrator/Desktop/diabetes.csv"
-df=pd.read_csv(path,header=0)
-
-df1 = df.replace(0, np.nan)
-
-print(df1.isnull().sum())
-
-m_features = ["glucose", "bloodpressure", "skinthickness", "insulin", "bmi"]
-
-for c in m_features:
-	avg = df[c].mean(axis=0)
-	df[c].replace(0,avg,inplace=True)
-
-print(df.isnull().sum())
-
 from sklearn.preprocessing import MinMaxScaler
-x = df.drop(['outcome'], axis=1)
-y = df['outcome']
-#x = df[:, 0:8]
-#y = df[:, 8:]
-scale = MinMaxScaler()
-x_scale = scale.fit_transform(x)
 
-print(x_scale)
+import re
+from IPython.display import Image
+#get_ipython().magic('matplotlib inline')
 
-from sklearn.model_selection import train_test_split
 
-'''
-print(df.info())
+# In[89]:
+
+path="diabetes.csv"
+df=pd.read_csv(path)
+
+
+# In[90]:
+
 print(df.head())
+
+
+# In[91]:
+
 print(df.tail())
 
-x=df.iloc[:,:-1]		
-y=df.iloc[:,-1]			
 
-print(x.isnull())
-print(y.isnull())
-'''
-'''
-from sklearn.preprocessing import StandardScaler
-Scaler_x=StandardScaler()
-x=Scaler_x.fit_transform(x)
+# In[92]:
+
+print(df.describe(include='all'))
+
+
+# In[93]:
+
+print(df.info())
+
+
+# In[94]:
+
+print(df.hist())
+print(plt.show())
+
+
+# In[95]:
+
+print(df.boxplot())
+print(plt.show())
+
+
+# In[96]:
+
+df.shape
+
+
+# In[97]:
+
+df.isnull().sum()
+
+
+# In[98]:
+
+df['Glucose'].isnull().sum()
+
+
+# In[99]:
+
+df['Age'].isnull().sum()
+
+
+# In[100]:
+
+df['Outcome'].isnull().sum()
+
+
+# In[101]:
+
+df['Insulin'].isnull().sum()
+
+
+# In[102]:
+
+newdf = df.dropna()
+newdf
+
+
+# In[103]:
+
+scaler = MinMaxScaler()
+print(scaler.fit(df))
+
+
+# In[104]:
+
+print(scaler.data_max_)
+
+
+# In[105]:
+
+print(scaler.transform(df))
+
+
+# In[106]:
+
+X = df.drop(['Outcome'],axis=1)
+X
+
+
+# In[107]:
+
+x = df.drop(['Outcome'],axis=1)
+x
+
+
+# In[108]:
+
+y=df['Outcome']
+y
+
+
+# In[109]:
 
 from sklearn.model_selection import train_test_split
 
-x_train,y_train,x_test,y_test=train_test_split(x,y,test_size=0.25,random_state=0)
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.25,random_state=0)
+
+
+# In[110]:
 
 from sklearn.naive_bayes import GaussianNB
+
+
+# In[111]:
+
 classifier=GaussianNB()
+
+
+# In[112]:
+
 classifier.fit(x_train,y_train)
 
-y_pred=classifier.predict(x_test)
 
-from sklearn.matrices import confusion_matrix
-cm=confusion_matrix(y_test,y_pred)
-print(cm)
-'''
+# In[113]:
+
+y_pred=classifier.predict(x_test)
+y_pred
+
+
+# In[114]:
+
+from sklearn.metrics import confusion_matrix
+CM=confusion_matrix(y_test,y_pred)
+print ('Confusion Matrix : ')
+print(CM)
+
+
+# In[115]:
+
+from sklearn.metrics import accuracy_score 
+print ('Accuracy Score : ')
+print(accuracy_score(y_test, y_pred))
+
+
+# In[116]:
+
+from sklearn.metrics import classification_report 
+print ('Report : ')
+print (classification_report(y_test, y_pred))
+
+
+# In[117]:
+
+import seaborn as sns
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(CM), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+
+# In[118]:
+
+tn, fp, fn, tp = CM.ravel()
+precision = tp/(tp+fp) # 81/(81+23)
+recall = tp/(tp+fn) # 81/(81+30)
+print('Precision:',precision,'\nRecall: ', recall)
+
+
+# In[ ]:
+
+
+
